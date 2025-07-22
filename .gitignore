@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.env
+*.sqlite3
+*.db
+
+# macOS
+.DS_Store
+
+# Docker
+*.tar
+*.log
+
+# Environment
+venv/
+.env
+.env.*
+
+# Test artifacts
+*.coverage
+htmlcov/
+test-results/
+
+# Uploaded files
+photo_service/static/uploads/
+
+# VSCode
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Secrets
+token_*.json
+client_secret.json
+
+# Ignore compiled or cached Python files
+**/__pycache__/
+
+# Ignore test image
+test_photo.jpg

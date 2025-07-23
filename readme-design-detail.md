@@ -138,7 +138,70 @@ photo-sharing/
 └── readme-milestone-2.md 📘 Documentation
 ```
 
+========================================================================================================================
+
+
+
+# app initialization 
 ---
+
+## 1. Docker Compose Startup
+
+- You run `docker compose up --build` in the project root.
+- Docker Compose reads docker-compose.yml and builds four services:
+  - auth_service
+  - user_service
+  - photo_service
+  - gateway (NGINX)
+
+Each service is built from its own directory and started in its own container. 
+The gateway depends on the other three, so they start first.
+
+---
+
+## 2. Service Initialization
+
+### a. **auth_service**
+- FastAPI app starts (main.py).
+- Loads environment variables (e.g., `JWT_SECRET`) from .env.
+- Sets up in-memory user store.
+- Adds CORS middleware for development.
+- Exposes `/auth/register` and `/auth/login` endpoints.
+
+### b. **user_service**
+- FastAPI app starts (main.py).
+- Loads JWT config from .env via config.py.
+- Sets up in-memory user profile store.
+- Adds CORS middleware.
+- Exposes `/users/me` (GET/POST) endpoints, requiring JWT.
+
+### c. **photo_service**
+- FastAPI app starts (main.py).
+- Loads JWT config from .env via config.py.
+- Ensures `static/uploads/` directory exists.
+- Adds CORS middleware.
+- Exposes `/photos/upload` and `/photos/photos` endpoints, requiring JWT.
+
+### d. **gateway**
+- NGINX starts with config from `nginx.conf`.
+- Routes `/auth/*` to auth_service, `/users/*` to user_service, `/photos/*` to photo_service.
+- Exposes everything on port 8080.
+
+---
+
+## 3. Ready for Requests
+
+- All APIs are now accessible via `http://localhost:8080` through the gateway.
+- Each service is isolated, but the gateway makes them appear as a single API surface.
+
+---
+
+## 4. Testing
+
+- You can run test_services.sh to exercise the full workflow: register, login, update profile, upload photo, list photos.
+
+========================================================================================================================
 
 Would you like to walk through one folder at a time (e.g., `auth_service/`) next? I can explain what’s in `main.py`, how JWT works, or even how `test_services.sh` does each step. Just say the word!
 
+========================================================================================================================

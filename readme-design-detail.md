@@ -202,6 +202,161 @@ The gateway depends on the other three, so they start first.
 
 ========================================================================================================================
 
-Would you like to walk through one folder at a time (e.g., `auth_service/`) next? I can explain what’s in `main.py`, how JWT works, or even how `test_services.sh` does each step. Just say the word!
+# Explanation `docker-compose.yml`:
+
+## Services
+
+### 1. auth_service
+- **Builds from:** auth_service
+- **Exposes port:** 8001 (container:host)
+- **Loads env vars from:** .env
+
+### 2. user_service
+- **Builds from:** user_service
+- **Exposes port:** 8002
+- **Loads env vars from:** .env
+- **Depends on:** auth_service (starts after auth)
+
+### 3. photo_service
+- **Builds from:** photo_service
+- **Exposes port:** 8003
+- **Loads env vars from:** .env
+- **Mounts volume:** Maps uploads on the host to `/app/static/uploads` in the container (for persistent photo storage)
+- **Depends on:** user_service (starts after user)
+
+### 4. gateway
+- **Builds from:** gateway
+- **Exposes port:** 8080 (host) mapped to 80 (container)
+- **Mounts config:** Maps nginx.conf to the container’s NGINX config (read-only)
+- **Depends on:** All three backend services (starts last)
+
+---
+
+## How it works
+
+- **Startup order:** auth_service → user_service → photo_service → gateway
+- **Networking:** All services are on the same Docker network and can communicate by service name.
+- **Gateway:** NGINX routes incoming requests to the correct backend service based on the URL path.
 
 ========================================================================================================================
+
+# auth service initialization
+
+```
+auth_service/
+    ├── Dockerfile
+    ├── main.py
+    ├── models
+    ├── routes
+    ├── shared
+    │   └── config.py
+    └── static
+        └── uploads
+
+shared
+    ├── config.py
+    ├── models
+    ├── routes
+    └── static
+        └── uploads
+```
+
+
+```Dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY ./shared /app/shared
+COPY . /app
+
+RUN pip install --no-cache-dir fastapi uvicorn python-multipart pyjwt
+
+ENV PYTHONPATH=/app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+```
+
+## auth_service/main.py
+
+commented inline
+
+## shared/config.py 
+
+| Function                         | Purpose                        |
+| -------------------------------- | ------------------------------ |
+| `create_access_token(data)`      | Creates a signed JWT           |
+| `hash_password(password)`        | Hashes a password securely     |
+| `verify_password(plain, hashed)` | Verifies password against hash |
+
+🧠 Concepts You Need First
+JWT (JSON Web Token) = a signed digital string that proves who you are.  
+Hashing = turning your password into a secret string that cannot be reversed.  
+bcrypt = secure hashing method for passwords.  
+SECRET_KEY = like a signing key or password for your app.  
+
+========================================================================================================================
+
+#  `test_services.sh` with comment 
+
+#!/bin/bash
+# Exit immediately if any command fails
+set -e
+
+## 🧠 Tips for Understanding
+#
+#   curl -s:        makes a silent HTTP request (no progress bar)
+#   jq:             command-line JSON processor (used to format/parse response)
+#   Bearer $TOKEN:  is how the JWT token is sent to authenticate Alice
+
+# Base URL of the gateway where all services are routed through
+BASE_URL="http://localhost:8080"
+
+# ---------------------------------------------------------------
+# ✅ STEP 1: Register a new user called "alice"
+# Sends a POST request to /auth/register with JSON payload
+# The response will include a JWT token
+echo "✅ Registering user 'alice'..."
+TOKEN=$(curl -s -X POST "$BASE_URL/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{"username": "alice", "password": "password123"}' \
+  | jq -r .access_token)
+
+# Save and display the access token
+echo "🔑 Got token: $TOKEN"
+
+# ---------------------------------------------------------------
+# 📝 STEP 2: Update Alice's profile
+# Sends a POST request to /users/me with authorization header and new profile data
+echo "📝 Updating profile..."
+curl -s -X POST "$BASE_URL/users/me" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice", "bio": "Photographer"}' \
+  | jq .
+
+# ---------------------------------------------------------------
+# 📄 STEP 3: Fetch Alice's profile
+# Sends a GET request to /users/me with the same token
+echo "📄 Fetching profile..."
+curl -s -X GET "$BASE_URL/users/me" \
+  -H "Authorization: Bearer $TOKEN" \
+  | jq .
+
+# ---------------------------------------------------------------
+# 📸 STEP 4: Upload a test photo
+# Sends a multipart POST request to /photos/upload with image file
+echo "📸 Uploading photo..."
+curl -s -X POST "$BASE_URL/photos/upload" \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "file=@test_photo.jpg" \
+  | jq .
+
+# ---------------------------------------------------------------
+# 🖼️ STEP 5: List uploaded photos
+# Sends a GET request to /photos/photos to list all uploaded images for Alice
+echo "🖼️  Listing uploaded photos..."
+curl -s -X GET "$BASE_URL/photos/photos" \
+  -H "Authorization: Bearer $TOKEN" \
+  | jq .
+
+

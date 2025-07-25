@@ -1,6 +1,7 @@
 # PhotoShare App - Milestone 2 -- Design Detail 
 
 ---
+<div style="page-break-after: always;"></div>
 
 ## 🧱 Step 1: What is this app?
 
@@ -12,6 +13,7 @@ This is a **photo-sharing app** broken into microservices:
 * There's a `gateway` that routes requests to the correct backend service.
 
 ---
+<div style="page-break-after: always;"></div>
 
 ## 🧱 Step 2: What does each part do?
 
@@ -38,6 +40,7 @@ This is a **photo-sharing app** broken into microservices:
 * Exposes everything on one port: `http://localhost:8080`
 
 ---
+<div style="page-break-after: always;"></div>
 
 ## ⚙️ Step 3: `docker-compose.yml`
 
@@ -89,6 +92,7 @@ Each service:
 * Can share files (like uploads) using volumes
 
 ---
+<div style="page-break-after: always;"></div>
 
 ## 📦 Step 4: How to run the app?
 
@@ -139,6 +143,7 @@ photo-sharing/
 ```
 
 ========================================================================================================================
+<div style="page-break-after: always;"></div>
 
 
 
@@ -201,6 +206,7 @@ The gateway depends on the other three, so they start first.
 - You can run test_services.sh to exercise the full workflow: register, login, update profile, upload photo, list photos.
 
 ========================================================================================================================
+<div style="page-break-after: always;"></div>
 
 # Explanation `docker-compose.yml`:
 
@@ -239,6 +245,7 @@ The gateway depends on the other three, so they start first.
 - **Gateway:** NGINX routes incoming requests to the correct backend service based on the URL path.
 
 ========================================================================================================================
+<div style="page-break-after: always;"></div>
 
 # auth service initialization
 
@@ -295,6 +302,7 @@ bcrypt = secure hashing method for passwords.
 SECRET_KEY = like a signing key or password for your app.  
 
 ========================================================================================================================
+<div style="page-break-after: always;"></div>
 
 #  `test_services.sh` with comment 
 

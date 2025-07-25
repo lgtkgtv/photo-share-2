@@ -1,7 +1,6 @@
 # PhotoShare App - Milestone 2 -- Design Detail 
 
 ---
-<div style="page-break-after: always;"></div>
 
 ## 🧱 Step 1: What is this app?
 
@@ -13,7 +12,6 @@ This is a **photo-sharing app** broken into microservices:
 * There's a `gateway` that routes requests to the correct backend service.
 
 ---
-<div style="page-break-after: always;"></div>
 
 ## 🧱 Step 2: What does each part do?
 
@@ -107,6 +105,7 @@ docker compose up --build
 This builds the containers and runs the services.
 
 ---
+<div style="page-break-after: always;"></div>
 
 ## 🧪 Step 5: How to test?
 
@@ -127,6 +126,7 @@ This script will:
 You’ll see printed output showing each step.
 
 ---
+<div style="page-break-after: always;"></div>
 
 ## 📁 Step 6: File/Folder Overview
 
@@ -141,13 +141,11 @@ photo-sharing/
 ├── test_services.sh   ✅ Script to test all APIs
 └── readme-milestone-2.md 📘 Documentation
 ```
+
 ---
 <div style="page-break-after: always;"></div>
 
-
-
 # app initialization 
----
 
 ## 1. Docker Compose Startup
 
@@ -192,6 +190,7 @@ The gateway depends on the other three, so they start first.
 - Exposes everything on port 8080.
 
 ---
+<div style="page-break-after: always;"></div>
 
 ## 3. Ready for Requests
 
@@ -199,14 +198,13 @@ The gateway depends on the other three, so they start first.
 - Each service is isolated, but the gateway makes them appear as a single API surface.
 
 ---
+<div style="page-break-after: always;"></div>
 
 ## 4. Testing
 
-- You can run test_services.sh to exercise the full workflow: register, login, update profile, upload photo, list photos.
+- You can run `test_services.sh` to exercise the full workflow: register, login, update profile, upload photo, list photos.
 
----
-<div style="page-break-after: always;"></div>
-
+```
 # Explanation `docker-compose.yml`:
 
 ## Services
@@ -234,8 +232,10 @@ The gateway depends on the other three, so they start first.
 - **Exposes port:** 8080 (host) mapped to 80 (container)
 - **Mounts config:** Maps nginx.conf to the container’s NGINX config (read-only)
 - **Depends on:** All three backend services (starts last)
+```
 
 ---
+<div style="page-break-after: always;"></div>
 
 ## How it works
 
@@ -244,9 +244,8 @@ The gateway depends on the other three, so they start first.
 - **Gateway:** NGINX routes incoming requests to the correct backend service based on the URL path.
 
 ---
-<div style="page-break-after: always;"></div>
 
-# auth service initialization
+### auth service initialization
 
 ```
 auth_service/
@@ -267,7 +266,6 @@ shared
         └── uploads
 ```
 
-
 ```Dockerfile
 FROM python:3.12-slim
 
@@ -282,11 +280,13 @@ ENV PYTHONPATH=/app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
 ```
 
-## auth_service/main.py
+---
+
+### auth_service/main.py
 
 commented inline
 
-## shared/config.py 
+### shared/config.py 
 
 | Function                         | Purpose                        |
 | -------------------------------- | ------------------------------ |
@@ -303,8 +303,9 @@ SECRET_KEY = like a signing key or password for your app.
 ---
 <div style="page-break-after: always;"></div>
 
-#  `test_services.sh` with comment 
+###  `test_services.sh` with comment 
 
+```sh
 #!/bin/bash
 # Exit immediately if any command fails
 set -e
@@ -365,5 +366,5 @@ echo "🖼️  Listing uploaded photos..."
 curl -s -X GET "$BASE_URL/photos/photos" \
   -H "Authorization: Bearer $TOKEN" \
   | jq .
-
+```
 

@@ -141,8 +141,7 @@ photo-sharing/
 ├── test_services.sh   ✅ Script to test all APIs
 └── readme-milestone-2.md 📘 Documentation
 ```
-
-========================================================================================================================
+---
 <div style="page-break-after: always;"></div>
 
 
@@ -205,7 +204,7 @@ The gateway depends on the other three, so they start first.
 
 - You can run test_services.sh to exercise the full workflow: register, login, update profile, upload photo, list photos.
 
-========================================================================================================================
+---
 <div style="page-break-after: always;"></div>
 
 # Explanation `docker-compose.yml`:
@@ -244,7 +243,7 @@ The gateway depends on the other three, so they start first.
 - **Networking:** All services are on the same Docker network and can communicate by service name.
 - **Gateway:** NGINX routes incoming requests to the correct backend service based on the URL path.
 
-========================================================================================================================
+---
 <div style="page-break-after: always;"></div>
 
 # auth service initialization
@@ -301,7 +300,7 @@ Hashing = turning your password into a secret string that cannot be reversed.
 bcrypt = secure hashing method for passwords.  
 SECRET_KEY = like a signing key or password for your app.  
 
-========================================================================================================================
+---
 <div style="page-break-after: always;"></div>
 
 #  `test_services.sh` with comment 
